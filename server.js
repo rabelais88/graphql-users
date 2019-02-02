@@ -1,11 +1,13 @@
 const express = require('express');
 const expressGraphQL = require('express-graphql');
+const schema = require('./schema/schema');
 
 const app = express();
 
 // add middleware
 app.use('/graphql', expressGraphQL({
-  graphqiql: true // remember not graphQL but graphiql
+  schema,
+  graphiql: true // remember not graphQL but graphiql
 }));
 
 app.listen(4000, () => {
