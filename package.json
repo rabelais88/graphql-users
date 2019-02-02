@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "express": "^4.16.4",
+    "express-graphql": "^0.7.1",
+    "graphql": "^14.1.1",
+    "lodash": "^4.17.11"
+  },
+  "name": "graphql-users",
+  "version": "1.0.0",
+  "description": "learning graph ql",
+  "main": "server.js",
+  "author": "sungryeol park",
+  "license": "MIT",
+  "scripts": {
+    "serve": "node server.js"
+  }
+}
