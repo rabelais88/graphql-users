@@ -3,7 +3,8 @@ const {
   GraphQLObjectType,
   GraphQLString,
   GraphQLInt,
-  GraphQLSchema
+  GraphQLSchema,
+  GraphQLList,
 } = graphql;
 // const _ = require('lodash');
 const axios = require('axios');
@@ -16,16 +17,23 @@ const localUrl = 'http://localhost:3000';
 
 const CompanyType = new GraphQLObjectType({
   name: 'Company',
-  fields: {
+  fields: () => ({ // to avoid order of import errors(UserType is referred inside CompanyType)
     id: { type: GraphQLString },
     name: { type: GraphQLString },
     description: { type: GraphQLString },
-  }
+    users : {
+      type: new GraphQLList(UserType),
+      resolve(parentValue, args) {
+        return axios.get(`${localUrl}/companies/${parentValue.id}/users`)
+          .then(res => res.data);
+      },
+    },
+  })
 });
 
 const UserType = new GraphQLObjectType({
   name: 'User', // Capitalize
-  fields: {
+  fields: () => ({
     id: { type: GraphQLString },
     firstName: { type: GraphQLString },
     age: { type: GraphQLInt },
@@ -37,7 +45,7 @@ const UserType = new GraphQLObjectType({
           .then(res => res.data);
       },
     },
-  }
+  })
 });
 
 
