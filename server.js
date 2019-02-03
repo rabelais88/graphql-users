@@ -10,6 +10,7 @@ app.use('/graphql', expressGraphQL({
   graphiql: true // remember not graphQL but graphiql
 }));
 
-app.listen(4000, () => {
-  console.log(`listening ${process.env.PORT}`);
+const defaultPort = process.env.PORT || 4000;
+app.listen(defaultPort, () => {
+  console.log(`listening ${defaultPort}`);
 });
