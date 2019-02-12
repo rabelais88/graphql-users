@@ -5,6 +5,7 @@ const {
   GraphQLInt,
   GraphQLSchema,
   GraphQLList,
+  GraphQLNonNull,
 } = graphql;
 // const _ = require('lodash');
 const axios = require('axios');
@@ -22,7 +23,7 @@ const CompanyType = new GraphQLObjectType({
     name: { type: GraphQLString },
     description: { type: GraphQLString },
     users : {
-      type: new GraphQLList(UserType),
+      type: new GraphQLList(UserType), // when it's not a single stuff, but an array of data
       resolve(parentValue, args) {
         return axios.get(`${localUrl}/companies/${parentValue.id}/users`)
           .then(res => res.data);
@@ -33,7 +34,7 @@ const CompanyType = new GraphQLObjectType({
 
 const UserType = new GraphQLObjectType({
   name: 'User', // Capitalize
-  fields: () => ({
+  fields: () => ({ // make it as function to avoid order of import errors
     id: { type: GraphQLString },
     firstName: { type: GraphQLString },
     age: { type: GraphQLInt },
@@ -76,6 +77,48 @@ const RootQuery = new GraphQLObjectType({
   },
 });
 
+const mutation = new GraphQLObjectType({
+  name: 'Mutation',
+  fields: {
+    addUser: {
+      type: UserType,
+      args: {
+        firstName: { type: new GraphQLNonNull(GraphQLString) },
+        age: { type: new GraphQLNonNull(GraphQLInt) },
+        companyId: { type: GraphQLString },
+      },
+      resolve(parentValue, { firstName, age }) {
+        return axios.post(`${localUrl}/users`, { firstName, age })
+          .then(res => res.data);
+      }
+    },
+    deleteUser: {
+      type: UserType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) }
+      },
+      resolve(parentValue, { id }) {
+        return axios.delete(`${localUrl}/users/${id}`)
+          .then(res => res.data);
+      },
+    },
+    editUser: {
+      type: UserType,
+      args: {
+        id: { type: new GraphQLNonNull(GraphQLString) },
+        firstName: { type: GraphQLString },
+        age: { type: GraphQLInt },
+        companyId: { type: GraphQLString },
+      },
+      resolve(parentValue, { id, firstName, age, companyId }) {
+        return axios.put(`${localUrl}/users/${id}`, { firstName, age, companyId })
+          .then(res => res.data);
+      }
+    }
+  },
+});
+
 module.exports = new GraphQLSchema({
-  query: RootQuery
+  query: RootQuery,
+  mutation,
 });
